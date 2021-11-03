@@ -66,38 +66,31 @@ trait FunSets extends FunSetsInterface {
    * Returns whether there exists a bounded integer within `s`
    * that satisfies `p`.
    */
-  def exists(s: FunSet, p: Int => Boolean): Boolean = {
-   // x => forall(singletonSet(x), p)
-    def iter(a: Int): Boolean = {
+  def exists(s: FunSet, p: Int => Boolean) : Boolean  = {
+   def iter(a: Int): Boolean = {
       if (a > bound) false
-      else if (contains(s, a) && p(a)) true
+      else if (contains(s, a) && p(a)) forall(singletonSet(a), x => p(x))
+      // else if (contains(s, a) && p(a)) true
+        // this is a working option, but requires the use of "forall"
       else iter(a + 1)
     }
     iter(-bound)
   }
 
 
-//printSet(map(singletonSet(1), x => x+10))
-  // else if (contains(s, a)) diff(s,singletonSet(a))
-
   /**
    * Returns a set transformed by applying `f` to each element of `s`.
    */
   def map(s: FunSet, f: Int => Int): FunSet = {
-    def iter(a: Int,newFunSet : FunSet): Boolean = {
-      if (a > bound) {false
-      } else {
-        if (contains(s, a)) {
-          contains(union(singletonSet(f(a)), filter(s, x => x != a)), f(a))
-          iter(a + 1, union(singletonSet(f(a)), filter(s, x => x != a)))
-        } else iter(a + 1, newFunSet)
-      }
+    def iter(a: Int, funSet: FunSet): FunSet = {
+      if (a > bound) funSet
+      else if (contains(s,a) && f(a)<= bound) iter(a+1,union(diff(funSet, singletonSet(a)),singletonSet(f(a))))
+      else iter(a + 1, funSet)
     }
-
-    x => iter(-bound, s)
-
-  /* // x => forall(s, union(singletonSet(f(x)), filter(s, x => x != x)))
-    x => forall(s, union(singletonSet(f(x)), s))*/
+    iter(-bound, singletonSet(-bound-1))
+    /*since the range is considered -bound +bound,
+    it turns out that we pass an empty set as a parameter.
+    I understand that this is a bad practice, but I haven't come up with any other ways.*/
   }
 
   /**

@@ -25,24 +25,24 @@ trait FunSets extends FunSetsInterface {
    * Returns the union of the two given sets,
    * the sets of all elements that are in either `s` or `t`.
    */
-  def union(s: FunSet, t: FunSet): FunSet = x  => contains(s,x) || contains(t,x)
+  def union(s: FunSet, t: FunSet): FunSet = x => contains(s, x) || contains(t, x)
 
   /**
    * Returns the intersection of the two given sets,
    * the set of all elements that are both in `s` and `t`.
    */
-  def intersect(s: FunSet, t: FunSet): FunSet = x  => contains(s,x) && contains(t,x)
+  def intersect(s: FunSet, t: FunSet): FunSet = x => contains(s, x) && contains(t, x)
 
   /**
    * Returns the difference of the two given sets,
    * the set of all elements of `s` that are not in `t`.
    */
-  def diff(s: FunSet, t: FunSet): FunSet = x => contains(s,x) && !contains(t,x)
+  def diff(s: FunSet, t: FunSet): FunSet = x => contains(s, x) && !contains(t, x)
 
   /**
    * Returns the subset of `s` for which `p` holds.
    */
-  def filter(s: FunSet, p: Int => Boolean): FunSet = x => p(x) && contains(s,x)
+  def filter(s: FunSet, p: Int => Boolean): FunSet = x => p(x) && contains(s, x)
 
 
   /**
@@ -59,6 +59,7 @@ trait FunSets extends FunSetsInterface {
       else if (contains(s, a) && (!p(a))) false
       else iter(a + 1)
     }
+
     iter(-bound)
   }
 
@@ -66,14 +67,13 @@ trait FunSets extends FunSetsInterface {
    * Returns whether there exists a bounded integer within `s`
    * that satisfies `p`.
    */
-  def exists(s: FunSet, p: Int => Boolean) : Boolean  = {
-   def iter(a: Int): Boolean = {
+  def exists(s: FunSet, p: Int => Boolean): Boolean = {
+    def iter(a: Int): Boolean = {
       if (a > bound) false
       else if (contains(s, a) && p(a)) forall(singletonSet(a), x => p(x))
-      // else if (contains(s, a) && p(a)) true
-        // this is a working option, but requires the use of "forall"
       else iter(a + 1)
     }
+
     iter(-bound)
   }
 
@@ -84,13 +84,11 @@ trait FunSets extends FunSetsInterface {
   def map(s: FunSet, f: Int => Int): FunSet = {
     def iter(a: Int, funSet: FunSet): FunSet = {
       if (a > bound) funSet
-      else if (contains(s,a) && f(a)<= bound) iter(a+1,union(diff(funSet, singletonSet(a)),singletonSet(f(a))))
+      else if (contains(s, a) && f(a) <= bound) iter(a + 1, union(diff(funSet, singletonSet(a)), singletonSet(f(a))))
       else iter(a + 1, funSet)
     }
-    iter(-bound, singletonSet(-bound-1))
-    /*since the range is considered -bound +bound,
-    it turns out that we pass an empty set as a parameter.
-    I understand that this is a bad practice, but I haven't come up with any other ways.*/
+
+    iter(-bound, singletonSet(-bound - 1))
   }
 
   /**
